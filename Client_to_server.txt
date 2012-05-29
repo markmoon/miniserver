@@ -1,0 +1,91 @@
+	
+	概述：
+	
+	本文档主要是指导在客户端怎样编程与服务器通信。
+	
+	为了描述方便，我们暂且称呼本服务器为：SmartHome Server，简称：SHS。
+	
+	服务器是运行在嵌入式Linux平台上的，服务器唯一对外的接口是Socket接口。
+	
+	所以为了可扩展和兼容性，在项目之初就建立了基础的，可扩展的协议，我称呼它为SmartXY，简称：SXY。
+	
+	所以如果你要和SHS通信，请遵循SXY协议给SHS发送报文和处理它给你的返回信息，因为这些信息也是遵循SXY标准的。
+	
+	
+	SXY协议：
+	
+	SXY协议和大多数协议一样，也是在一个定长的数据段中规定了数据的含义和一些属性。
+	
+	在通信过程的报文包括一个由SXY协议指导的报文头部和具体的数据包。
+	
+	下面是报文头部的定义：
+	
+	struct _control_data_header {
+		uint16		len;			/*数据包的长度，它只表示数据的长度（字节），不包括报文头部*/
+		uint8		encrpyt;		/*报文的加密方式*/
+		uint8		mo;				/*定义用户状态*/
+		uint8		ttl;			/*定义报文生存周期*/
+		uint8		extent;		/*用于以后的扩展*/
+		uint16		ki;				/*定义控制命令*/
+	};
+	typedef struct _control_data_header	ctl_hdr;
+	
+	报文头部的长度是确定的，8个字节。每个字段的含义见它的注释。
+	
+	注意：第一个字段：len 指的是后面所接的数据包的长度，它不包括报文头部。
+	
+	凡是在客户端和SHS之间通信的数据报文都必须包含报文头部。
+	
+	注册与登录：
+	
+	struct user {
+		uint8 username[128];
+		uint8 password[128];
+	};
+	
+	首先在你发送的数据报文的头部中说明ki的值为：KI_REGISTER或者是：KI_LOGIN
+	
+	len的值需要设置为：sizeof(struct user);
+	
+	在报文后发送一个填充的用户信息结构体：struct user；
+	
+	所以你发送的数据包应该是这样：
+	
+	struct register {
+		ctl_hdr hdr;
+		struct user user_struct;
+	};
+	
+	
+	struct login {
+		ctl_hdr hdr;
+		struct user user_struct;
+	};
+	
+	电视控制：
+	request.head.ttl = id;
+	request.head.extent = passed;
+	request.head.mo = mode;
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
